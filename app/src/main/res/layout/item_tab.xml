@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center">
+
+    <!--在imageview的android:tint中引用selector(里面定义了被选中和默认状态下的颜色),即可动态改变颜色-->
+    <ImageView
+        android:id="@+id/tab_iv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:tint="@drawable/tab_select_color"
+        />
+    <TextView
+        android:id="@+id/tab_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:textSize="12sp"
+        android:textColor="@drawable/tab_select_color"/>
+</LinearLayout>

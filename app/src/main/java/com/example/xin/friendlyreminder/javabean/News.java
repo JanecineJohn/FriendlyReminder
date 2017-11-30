@@ -1,7 +1,8 @@
-package com.example.xin.friendlyreminder;
+package com.example.xin.friendlyreminder.javabean;
 
 /**
  * Created by xin on 2017/11/7.
+ *
  */
 
 public class News {

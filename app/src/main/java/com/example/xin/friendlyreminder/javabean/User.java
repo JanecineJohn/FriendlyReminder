@@ -1,4 +1,6 @@
-package com.example.xin.friendlyreminder;
+package com.example.xin.friendlyreminder.javabean;
+
+import android.graphics.drawable.Drawable;
 
 /**
  * Created by xin on 2017/11/18.
@@ -12,6 +14,7 @@ public class User {
     private String userName;//用户名(not_Judge)
     private String userPassword;//密码
     private String userPhone;//手机号(11数字)
+    private Drawable userIcon;//用户头像，先使用默认
 
     public int getUserID() {
         return userID;
@@ -43,6 +46,13 @@ public class User {
 
     public void setUserPhone(String userPhone) {
         this.userPhone = userPhone;
+    }
+
+    public Drawable getUserIcon(){
+        return userIcon;
+    }
+    public void  setUserIcon(Drawable userIcon){
+        this.userIcon = userIcon;
     }
 
 }

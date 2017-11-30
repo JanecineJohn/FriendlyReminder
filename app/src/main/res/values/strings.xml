@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">FriendlyReminder</string>
+    <string name="username_login">请输入用户名</string>
+    <string name="password_login">请输入密码</string>
+    <string name="signIn">登陆</string>
+    <string name="signUp">注册</string>
 </resources>

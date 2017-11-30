@@ -1,4 +1,4 @@
-package com.example.xin.friendlyreminder;
+package com.example.xin.friendlyreminder.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -8,6 +8,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.example.xin.friendlyreminder.R;
 
 /**
  * Created by xin on 2017/11/5.
@@ -32,7 +34,7 @@ public class myNewsFrag extends Fragment{
         super.onActivityCreated(savedInstanceState);
         swipeRefresh = view.findViewById(R.id.swipe_mynewsfrag);
         myNewsRecyc = view.findViewById(R.id.recyc_mynewsfrag);
-        swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
+        swipeRefresh.setColorSchemeResources(R.color.colorSelect);
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -49,7 +51,7 @@ public class myNewsFrag extends Fragment{
 //                LinearLayoutManager layoutManager =
 //                        new LinearLayoutManager(getActivity());
 //                myNewsRecyc.setLayoutManager(layoutManager);//设置recyclerview的布局方式
-//                myNewsRecyc.setAdapter(new NewsAdapter(newsList));//设置recyclerview的适配器
+//                myNewsRecyc.setAdapter(new FriendsAdapter());//设置recyclerview的适配器
 //    }
 
 }

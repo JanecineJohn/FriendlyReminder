@@ -1,4 +1,4 @@
-package com.example.xin.friendlyreminder;
+package com.example.xin.friendlyreminder.fragments;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,6 +11,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.example.xin.friendlyreminder.R;
+import com.example.xin.friendlyreminder.javabean.User;
+import com.example.xin.friendlyreminder.adapters.FriendsAdapter;
+import com.example.xin.friendlyreminder.utils.RefreshFrags;
 
 import java.util.List;
 
@@ -44,15 +49,17 @@ public class FriendsListFrag extends Fragment{
             @Override
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
-                friendsList = (List<User>) msg.obj;
-                LinearLayoutManager layoutManager =
-                        new LinearLayoutManager(getActivity());//创建布局实例
-                recyclerView.setLayoutManager(layoutManager);//设置布局
-                recyclerView.setAdapter(new NewsAdapter(friendsList));//设置适配器，将数据显示出来
+                if (msg.what == 1){
+                    friendsList = (List<User>) msg.obj;
+                    LinearLayoutManager layoutManager =
+                            new LinearLayoutManager(getActivity());//创建布局实例
+                    recyclerView.setLayoutManager(layoutManager);//设置布局
+                    recyclerView.setAdapter(new FriendsAdapter(friendsList));//设置适配器，将数据显示出来
+                }
             }
         };
 
-        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);//等待刷新的圈的颜色
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorSelect);//等待刷新的圈的颜色
         //为下拉刷新设置动作监听器
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override

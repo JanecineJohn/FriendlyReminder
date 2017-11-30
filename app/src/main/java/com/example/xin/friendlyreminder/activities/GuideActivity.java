@@ -1,9 +1,11 @@
-package com.example.xin.friendlyreminder;
+package com.example.xin.friendlyreminder.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+
+import com.example.xin.friendlyreminder.R;
 
 /**如有需要，可将记录打开次数改为记录用户名密码，保证必须有用户名密码登陆了才能使用后续功能*/
 public class GuideActivity extends AppCompatActivity {

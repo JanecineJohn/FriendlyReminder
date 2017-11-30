@@ -1,4 +1,4 @@
-package com.example.xin.friendlyreminder;
+package com.example.xin.friendlyreminder.activities;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -6,6 +6,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.example.xin.friendlyreminder.R;
 
 public class LoginActivity extends AppCompatActivity {
 
