@@ -43,6 +43,7 @@ public class myNewsFrag extends Fragment{
                 swipeRefresh.setRefreshing(false);//刷新完成，隐藏刷新控件
             }
         });
+
     }
 
 //    private void setRecyc(){

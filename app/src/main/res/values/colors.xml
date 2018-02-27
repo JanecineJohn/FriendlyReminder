@@ -7,6 +7,7 @@
     <color name="color_bg_friends_item">#E0E0E0</color>
     <color name="colorUnselect">#8A8A8A</color>
     <color name="colorSelect">#66CD00</color>
+    <color name="colorSelectBlue">#1296db</color>
     <color name="colorTabBackground">#E0E0E0</color>
-    <color name="colorAddFriend">#FFFFFF</color>
+    <color name="color_tip_bg">#55333333</color>
 </resources>

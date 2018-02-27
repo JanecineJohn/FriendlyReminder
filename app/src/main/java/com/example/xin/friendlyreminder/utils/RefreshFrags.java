@@ -2,7 +2,9 @@ package com.example.xin.friendlyreminder.utils;
 
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 
+import com.example.xin.friendlyreminder.R;
 import com.example.xin.friendlyreminder.javabean.User;
 import com.google.gson.Gson;
 
@@ -12,14 +14,10 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 
 /**
@@ -59,61 +57,70 @@ public class RefreshFrags {
 
     /**返回好友列表集合*/
     /**此方法异步，在另一线程*/
-    public void refresh_FriendsListFrag(final Handler handler){
-        //下面是测试代码
-        User user = new User();
-        user.setUserID(1);
-        //上面是测试代码
-
-        final String url = "http://192.168.1.104:10001/api/friendList";//服务器地址
+    public void refresh_FriendsListFrag(User user,String url,final Handler handler){
 
         //异步执行返回的call实例，获取服务器数据
-        dataRequest(user,url).enqueue(new Callback() {
+        new httpRequest().dataRequest(user,url).enqueue(new Callback() {
             @Override
             public void onFailure(okhttp3.Call call, IOException e) {
-                //Log.i("请求失败：","请求失败");
-                List<User> fail = new ArrayList<>();
-                User test = new User();
-                test.setUserName("请求失败");
-                test.setUserPhone("以下为测试代码:");
-                fail.add(test);
-                for (int i=0;i<50;i++){
-                    User failUser = new User();
-                    failUser.setUserName("用户名"+i);
-                    failUser.setUserPhone("电话号码："+i);
-                    fail.add(failUser);
-                }
+                Log.i("请求失败：","请求失败");
                 Message message= new Message();
-
-                message.what = 1;
-                message.obj = fail;
+                message.what = 0;
+                message.obj = "请求数据失败，请检查网络";
                 handler.sendMessage(message);
             }
 
             @Override
             public void onResponse(okhttp3.Call call, Response response) throws IOException {
                 try {
+                    String responseMsg = response.body().string();
                     List<User> list = new ArrayList<>();
                     Gson resGson = new Gson();
-                    JSONObject jsonObject = new JSONObject(response.body().string());
+                    JSONObject jsonObject = new JSONObject(responseMsg);
                     /**获取好友申请数据，并转化为User类对象，添加到集合中*/
+                    if (jsonObject.getString("requestData").equals("null")){
+                        //如果为空，不作任何操作
+                    }else {
+                        JSONArray requestData = jsonObject.getJSONArray("requestData");//获取好友请求
+                        for (int i=0;i<requestData.length();i++){
+                            User eachUser = resGson.fromJson
+                                    (requestData.getJSONObject(i).toString(),User.class);
+                            eachUser.setLetter("↑");
+                            list.add(eachUser);
+                        }
+                    }
 
                     /**获取已有好友数据,并转化为一个个User类对象，添加到集合中*/
-                    JSONArray jsonArray = jsonObject.getJSONArray("friendData");//获取已有好友数据
-                    User eachUser;//创建一个User实例接收每个JSON数据转化得到的User
-                    for (int i=0; i<jsonArray.length();i++){
-                        //将服务器返回的已有好友JSON数据转为User类
-                        eachUser = resGson.fromJson
-                                (jsonArray.getJSONObject(i).toString(), User.class);
-                        list.add(eachUser);
+                    if (jsonObject.getString("friendData").equals("null")){
+                        //如果为空，不作任何操作
+                    }else {
+                        JSONArray jsonArray = jsonObject.getJSONArray("friendData");//获取已有好友数据
+                        for (int i=0; i<jsonArray.length();i++){
+                            //将服务器返回的已有好友JSON数据转为User类
+                            User eachUser = resGson.fromJson
+                                    (jsonArray.getJSONObject(i).toString(), User.class);
+                            //Log.i("jsonObject：",jsonArray.getJSONObject(i).toString());
+                            /**可以在此对letter对象赋值*/
+                            //获取用户名的拼音首字母
+                            String firstSpell = ChineseToEnglish.getFirstSpell(eachUser.getUserName());//将中文转换为拼音,第一个字取全拼,后面的字取首字母
+                            String substring = firstSpell.substring(0, 1).toUpperCase();//提取出首字母，并转换为大写
+                            //将拼音首字母与A-Z作匹配，区分这个名字是汉语或字母，还是特殊字符
+                            if(substring.matches("[A-Z]")){
+                                eachUser.setLetter(substring);//letter属性，用来对各个名字排序
+                            }else {
+                                eachUser.setLetter("#");
+                            }
+                            list.add(eachUser);
+                        }
                     }
+                    /**按如此优先级排序：↑,A-Z,# */
+                    /**CompareSort()继承了Comparator<User>,*/
+                    Collections.sort(list, new CompareSort());//设置好letter属性后，根据letter属性为集合排序
                     //将list集合放到handler的msg的obj中返回
                     Message message = new Message();
-                    message.what = 1;//1代表这个列表集合里的内容是已有好友
+                    message.what = 1;
                     message.obj = list;
                     handler.sendMessage(message);
-
-                    /**获取好友申请数据,并转化为一个个friend_request类对象，添加到集合中*/
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -143,23 +150,46 @@ public class RefreshFrags {
         }catch (Exception e){
             e.printStackTrace();
         }
-
-
     }
+    /**下面方法已废弃，暂未删除*/
+    //将得到的集合进行letter字段赋值和排序
+    /*private List<User> listComparator(List<User> list){
+        for (int i=0;i<list.size();i++){
+            User user = list.get(i);//依次获取每个user对象
+            //获取用户名的拼音首字母
+            String firstSpell = ChineseToEnglish.getFirstSpell(user.getUserName());//将中文转换为拼音,第一个字取全拼,后面的字取首字母
+            String substring = firstSpell.substring(0, 1).toUpperCase();//提取出首字母，并转换为大写
+            //将拼音首字母与A-Z作匹配，区分这个名字是汉语或字母，还是特殊字符
+            if(substring.matches("[A-Z]")){
+                user.setLetter(substring);//letter属性，用来对各个名字排序
+            }else {
+                user.setLetter("#");
+            }
+        }
 
-    //传入本机用户及请求数据的接口.
-    //此方法将本机用户和请求接口封装为http请求，返回一个call实例
-    private Call dataRequest(User user,String url){
-        Gson gson = new Gson();
-        String jsonUser = gson.toJson(user);//将传入的类对象转成Json格式的字符串
-        MediaType JSON = MediaType.parse("application/json;charset=utf-8");
-        OkHttpClient client = new OkHttpClient();//创建okhttp实例
-        RequestBody body = RequestBody.create(JSON,jsonUser);
-        final Request request = new Request.Builder()
-                .url(url)
-                .post(body)
-                .build();
-        okhttp3.Call call = client.newCall(request);//以request为参数创建一个call实例
-        return call;
+        //按如此优先级排序：↑,A-Z,#
+        //CompareSort()继承了Comparator<User>
+        Collections.sort(list, new CompareSort());//设置好letter属性后，根据letter属性为集合排序
+        return list;
+    }*/
+
+    //模拟一些数据，当返回失败的时候调用
+    private List<User> createData(){
+        List<User> data = new ArrayList<>();
+        for(int i=0;i<20;i++){
+            User user1 = new User();
+            user1.setUserName("刘海");
+            user1.setUserPhone("12345678910");
+            data.add(user1);
+            User user2 = new User();
+            user2.setUserName("张三");
+            user2.setUserPhone("12345678910");
+            data.add(user2);
+            User user3 = new User();
+            user3.setUserName("王五");
+            user3.setUserPhone("12345678910");
+            data.add(user3);
+        }
+        return data;
     }
 }

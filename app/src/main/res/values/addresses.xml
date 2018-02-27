@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="signUpAddress">http://10.242.10.30:10002/api/signup</string>
+    <string name="signInAddress">http://10.242.10.30:10002/api/signin</string>
+    <string name="friendListAddress">http://10.242.10.30:10002/api/friendList</string>
+    <string name="acceptRequestAddress">http://10.242.10.30:10002/api/accept</string>
+    <string name="friendRequestAddress">http://10.242.10.30:10002/api/friendRequest</string>
+    <string name="searchUserAddress">http://10.242.10.30:10002/api/searchUser</string>
+    <string name="pushNoticeAddress">http://10.242.10.30:10002/api/pushNotice</string>
+    <string name="noticeListAddress">http://10.242.10.30:10002/api/noticeList</string>
+    <string name="webSocketAddress">ws://10.242.10.30:10002/connect/</string>
+</resources>
