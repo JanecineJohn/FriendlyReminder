@@ -4,7 +4,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
-import com.example.xin.friendlyreminder.R;
+import com.example.xin.friendlyreminder.interfaces.getNewsListener;
+import com.example.xin.friendlyreminder.javabean.News;
+import com.example.xin.friendlyreminder.javabean.Notice;
 import com.example.xin.friendlyreminder.javabean.User;
 import com.google.gson.Gson;
 
@@ -17,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
@@ -38,21 +41,47 @@ public class RefreshFrags {
 //        mContext = context;
 //    }
 
-    /**返回我的消息集合*/
-    public List<String> refresh_myNewsFrag(){
+    /**返回我的消息集合:
+     * userId：我的用户Id
+     * listType：所需的消息类型
+     * listType=1：我发出的消息
+     * listType=2：我收到的消息*/
+    public List<News> refresh_myNewsFrag(int userId, int listType, String url, final getNewsListener listener){
 
-        final List<String> testList = new ArrayList<>();/**测试用*/
-
-        new Thread(new Runnable() {
+        //构建一个对象用于向后台请求数据
+        RequestNoticeList request = new RequestNoticeList(userId,listType);
+        //新建一个集合，用于存储所有的news
+        final List<News> newsList = new ArrayList<>();
+        new httpRequest().dataRequest(request,url).enqueue(new Callback() {
             @Override
-            public void run() {
-                for (int i=0;i<100;i++){
-                    testList.add("在我的信息页面的第" + i + "条消息");
+            public void onFailure(Call call, IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                try {
+                    String responseMsg = response.body().string();
+                    JSONObject jsonObject = new JSONObject(responseMsg);
+                    if (jsonObject.getString("noticeData").equals("null")){
+                        //为空不做任何操作
+                    }else {
+                        Gson gson = new Gson();
+                        JSONArray newsArray = jsonObject.getJSONArray("noticeData");//获取好友请求
+                        for (int i=0;i<newsArray.length();i++){
+                            Notice eachNotice = gson.fromJson(newsArray.getJSONObject(i).toString(),Notice.class);
+                            News eachNews = new News(eachNotice.getNoticeTitle(),eachNotice.getNoticeContent(),eachNotice.getNoticeTime());
+                            newsList.add(eachNews);
+                        }
+                    }
+                    listener.getNewsDone(newsList);//将装载所有数据的集合回调出去
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
             }
-        }).start();
+        });
 
-        return testList;
+        return newsList;
     }
 
     /**返回好友列表集合*/
@@ -128,6 +157,21 @@ public class RefreshFrags {
         });
     }
 
+
+    /**
+     * 内部类
+     * 用于构建向后台请求数据的对象
+     * 只在此类有用，故设为内部类*/
+    class RequestNoticeList{
+        private int userId;
+        private int listType;
+
+        public RequestNoticeList(int userId,int listType){
+            this.userId = userId;
+            this.listType = listType;
+        }
+    }
+
     /**重构未测试*/
     /**将某个jsonObject(传入参数)的某一个数组(传入参数)解析成类对象(类型作为参数)(未实现)添加到集合并以特定标识(传入参数)传到fragment中*/
     private void getFriendData(JSONObject jsonObject,String nameJsonArray,int what,final Handler handler){
@@ -166,30 +210,6 @@ public class RefreshFrags {
                 user.setLetter("#");
             }
         }
-
-        //按如此优先级排序：↑,A-Z,#
-        //CompareSort()继承了Comparator<User>
-        Collections.sort(list, new CompareSort());//设置好letter属性后，根据letter属性为集合排序
-        return list;
     }*/
 
-    //模拟一些数据，当返回失败的时候调用
-    private List<User> createData(){
-        List<User> data = new ArrayList<>();
-        for(int i=0;i<20;i++){
-            User user1 = new User();
-            user1.setUserName("刘海");
-            user1.setUserPhone("12345678910");
-            data.add(user1);
-            User user2 = new User();
-            user2.setUserName("张三");
-            user2.setUserPhone("12345678910");
-            data.add(user2);
-            User user3 = new User();
-            user3.setUserName("王五");
-            user3.setUserPhone("12345678910");
-            data.add(user3);
-        }
-        return data;
-    }
 }

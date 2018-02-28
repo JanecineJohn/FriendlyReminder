@@ -17,7 +17,9 @@ import android.widget.Toast;
 
 import com.example.xin.friendlyreminder.R;
 import com.example.xin.friendlyreminder.activities.GuideActivity;
+import com.example.xin.friendlyreminder.javabean.Notice;
 import com.example.xin.friendlyreminder.utils.userInfoManager;
+import com.google.gson.Gson;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
@@ -47,15 +49,15 @@ public class WebSocketClientService extends Service {
         super.onCreate();
 
         /**测试*/
-        new AlertDialog.Builder(this)
-                .setMessage("后台被启动，OnCreate")
-                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-
-                    }
-                })
-                .show();
+//        new AlertDialog.Builder(WebSocketClientService.this)
+//                .setMessage("后台被启动，OnCreate")
+//                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialogInterface, int i) {
+//
+//                    }
+//                })
+//                .show();
     }
 
     @Override
@@ -67,15 +69,15 @@ public class WebSocketClientService extends Service {
             connect();//连接
 
             /**测试*/
-            new AlertDialog.Builder(this)
-                    .setMessage("OnStartCommand,调用了连接方法")
-                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-
-                        }
-                    })
-                    .show();
+//            new AlertDialog.Builder(WebSocketClientService.this)
+//                    .setMessage("OnStartCommand,调用了连接方法")
+//                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface dialogInterface, int i) {
+//
+//                        }
+//                    })
+//                    .show();
         }
         return START_STICKY;
     }
@@ -146,11 +148,12 @@ public class WebSocketClientService extends Service {
      * 接收到提醒，弹出通知
      */
     private void setNotification(String s){
+        Notice notice = new Gson().fromJson(s,Notice.class);//这句可能是导致出错的源头
         Intent intent = new Intent(this, GuideActivity.class);
         PendingIntent pi = PendingIntent.getActivity(this,0,intent,0);
         Notification notification = new Notification.Builder(this)
-                .setContentTitle("")
-                .setContentText(s)
+                .setContentTitle(notice.getNoticeTitle())
+                .setContentText(notice.getNoticeContent())
                 .setWhen(System.currentTimeMillis())
                 .setSmallIcon(R.drawable.clock)
                 .setContentIntent(pi)

@@ -1,10 +1,7 @@
 package com.example.xin.friendlyreminder.adapters;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AlertDialog;
@@ -20,25 +17,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.xin.friendlyreminder.R;
-import com.example.xin.friendlyreminder.activities.MainActivity;
-import com.example.xin.friendlyreminder.activities.signInActivity;
 import com.example.xin.friendlyreminder.javabean.Notice;
 import com.example.xin.friendlyreminder.javabean.User;
-import com.example.xin.friendlyreminder.services.WebSocketClientService;
 import com.example.xin.friendlyreminder.utils.ChineseToEnglish;
-import com.example.xin.friendlyreminder.utils.CompareSort;
-import com.example.xin.friendlyreminder.utils.RefreshFrags;
 import com.example.xin.friendlyreminder.utils.httpRequest;
 import com.example.xin.friendlyreminder.utils.userInfoManager;
-import com.google.gson.Gson;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import okhttp3.Call;
@@ -48,8 +36,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-
-import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by xin on 2017/11/7.
@@ -253,13 +239,19 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.ViewHold
                 .setPositiveButton("发送", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        Notice notice = new Notice(uiManager.getMyUserId(),toId,
-                                "来自" + uiManager.getMyUserName() + "的消息",
-                                contentEdt.getText().toString(),
-                                //将填入的时分转为long型秒数
-                                toTimeStamp(Integer.parseInt(hourEdt.getText().toString().trim()),Integer.parseInt(minEdt.getText().toString().trim()))
-                                );
-                        pushNotice(notice);
+                        if (contentEdt.getText()==null || hourEdt.getText()==null || minEdt.getText()==null){
+                            //判断如果要填的内容有任意一个为空，则提示用户
+                            Toast.makeText(mContext,"内容时间不能为空",Toast.LENGTH_SHORT).show();
+                        }else {
+                            //正确填写，则向目标用户发送提示
+                            Notice notice = new Notice(uiManager.getMyUserId(),toId,
+                                    uiManager.getMyUserName(),//noticeTitle内容其实是发送提醒的用户名
+                                    contentEdt.getText().toString(),
+                                    //将填入的时分转为long型秒数
+                                    toTimeStamp(Integer.parseInt(hourEdt.getText().toString().trim()),Integer.parseInt(minEdt.getText().toString().trim()))
+                            );
+                            pushNotice(notice);
+                        }
                     }
                 })
                 .setNegativeButton("取消", new DialogInterface.OnClickListener() {
